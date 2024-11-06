@@ -1,2 +1,2 @@
 # MovieMuse
-Movie Recommender
+RAG Movie Recommender using Python
