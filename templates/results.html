@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Recommendations</title>
+</head>
+<body>
+    <h1>Movie Recommendations</h1>
+    {% if movies %}
+        <ul>
+        {% for movie in movies %}
+            <li>
+                <h3>{{ movie.title }}</h3>
+                <p>{{ movie.overview }}</p>
+                <p>Release Date: {{ movie.release_date }}</p>
+                <p>Rating: {{ movie.vote_average }}/10</p>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No movies found.</p>
+    {% endif %}
+</body>
+</html>
