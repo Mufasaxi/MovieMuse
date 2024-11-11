@@ -2,22 +2,59 @@
 <html>
 <head>
     <title>Movie Recommendations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .movie {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .movie-title {
+            color: #007bff;
+            margin-top: 0;
+        }
+        .movie-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .back-button {
+            display: inline-block;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <h1>Movie Recommendations</h1>
     {% if movies %}
-        <ul>
         {% for movie in movies %}
-            <li>
-                <h3>{{ movie.title }}</h3>
+            <div class="movie">
+                <h2 class="movie-title">{{ movie.title }}</h2>
+                <p class="movie-meta">
+                    Release Date: {{ movie.release_date }}
+                    {% if movie.vote_average %}
+                        | Rating: {{ "%.1f"|format(movie.vote_average) }}/10
+                    {% endif %}
+                </p>
                 <p>{{ movie.overview }}</p>
-                <p>Release Date: {{ movie.release_date }}</p>
-                <p>Rating: {{ movie.vote_average }}/10</p>
-            </li>
+            </div>
         {% endfor %}
-        </ul>
     {% else %}
-        <p>No movies found.</p>
+        <p>No movies found matching your preferences. Try a different description!</p>
     {% endif %}
+    <a href="/" class="back-button">Try Another Search</a>
 </body>
 </html>
