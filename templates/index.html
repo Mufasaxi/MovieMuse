@@ -1,40 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Muse</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <title>Movie Recommendations</title>
     <style>
-        .title-font {
-            font-family: 'Playfair Display', serif;
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #e1e1e1;
+        }
+        .search-form {
+            margin: 20px 0;
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            background-color: #2d2d2d;
+            border: 1px solid #404040;
+            color: #e1e1e1;
+            border-radius: 4px;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #6b46c1;
+            box-shadow: 0 0 0 2px rgba(107, 70, 193, 0.2);
+        }
+        input[type="text"]::placeholder {
+            color: #888;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #6b46c1;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #553c9a;
+        }
+        h1 {
+            color: #9f7aea;
+            text-align: center;
+            margin-bottom: 30px;
         }
     </style>
 </head>
-<body class="min-h-screen bg-gray-900">
-    <div class="container mx-auto px-4 py-8">
-        <header class="text-center mb-12">
-            <h1 class="title-font text-5xl text-purple-400 mb-2">MovieMuse</h1>
-            <div class="w-24 h-1 bg-purple-500 mx-auto"></div>
-        </header>
-        
-        <main class="max-w-2xl mx-auto">
-            <h2 class="text-3xl font-semibold text-gray-100 mb-8 text-center">Find Your Next Movie</h2>
-            
-            <div class="bg-gray-800 rounded-lg shadow-xl p-6 border border-gray-700">
-                <label class="block text-gray-300 text-lg mb-4">
-                    Describe the type of movie you're in the mood for:
-                </label>
-                <textarea 
-                    class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-100 h-32 resize-none placeholder-gray-400"
-                    placeholder="E.g., Something adventurous with plot twists...">
-                </textarea>
-                <button class="mt-4 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors w-full font-semibold">
-                    Get Recommendations
-                </button>
-            </div>
-        </main>
-    </div>
+<body>
+    <h1>Find Your Next Movie</h1>
+    <form class="search-form" method="post">
+        <p>Describe the type of movie you're in the mood for:</p>
+        <input type="text" id="preferences" name="preferences" 
+               placeholder="e.g., 'action movies with car chases' or 'romantic comedies set in New York'" required>
+        <br>
+        <button type="submit">Get Recommendations</button>
+    </form>
 </body>
 </html>
