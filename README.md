@@ -5,6 +5,8 @@ Can't figure out what to watch for Movie Night? We got you!
 
 Just enter the general vibes you're looking for and MovieMuse will provide you with a handful of movies tailored to your needs.
 
+![Demo of program](Demo/demo.gif)
+
 ## Setup
 ### Create and activate Virtual Environment
 Create a virtual environment using the following command
