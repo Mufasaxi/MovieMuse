@@ -25,6 +25,8 @@ Install the dependencies using
 pip install -r requirements.txt
 ```
 
+In addition to those, you'll need two API Keys. One for [TMDB](https://developer.themoviedb.org/docs/getting-started) and one for [OpenAI](https://openai.com/index/openai-api/)
+
 ## Starting the application
 After setting up the environment and installing the dependencies the app can be run using
 ```
