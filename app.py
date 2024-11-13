@@ -101,6 +101,7 @@ def get_openai_analysis(user_preferences):
         logging.error(f"Error in OpenAI analysis: {str(e)}")
         return default_analysis
 
+# TODO: Use Movie Overview to improve tailoring of movies for user preferences
 def discover_movies(analysis):
     """Discover movies based on complex criteria"""
     try:
