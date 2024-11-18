@@ -6,6 +6,8 @@ import json
 from collections import defaultdict
 import logging
 from datetime import datetime
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
 
 # Set up logging
 logging.basicConfig(
@@ -101,7 +103,6 @@ def get_openai_analysis(user_preferences):
         logging.error(f"Error in OpenAI analysis: {str(e)}")
         return default_analysis
 
-# TODO: Use Movie Overview to improve tailoring of movies for user preferences
 def discover_movies(analysis):
     """Discover movies based on complex criteria"""
     try:
@@ -187,9 +188,72 @@ def get_movie_keywords(movie_id):
         logging.error(f"Error getting keywords for movie {movie_id}: {str(e)}")
         return []
 
-def calculate_relevance_score(movie, analysis, movie_keywords):
-    """Calculate a relevance score for a movie based on user preferences"""
+# TODO: Optimise usage of embeddings and see if possible to cut processing time and costs (API Usage)
+def get_text_embedding(text):
+    """Get embeddings for a specific text using OpenAI API"""
     try:
+        response = openai.embeddings.create(
+            input=text,
+            model="text-embedding-3-small"
+        )
+        return response.data[0].embedding
+    except Exception as e:
+        logging.error(f"Error getting text embeddinng: {str(e)}")
+        return None
+    
+def calculate_overview_relevance(movie_overview, user_preferences, analysis):
+    """Calculate relevance score based on text similarity and semantic matching"""
+    try:
+        # Get embeddings for user preferences and movie overview
+        preferences_embedding = get_text_embedding(user_preferences)
+        overview_embedding = get_text_embedding(movie_overview)
+        
+        if not preferences_embedding or not overview_embedding:
+            return 0
+        
+        # Calculate cosine similarity
+        similarity = cosine_similarity(
+            np.array(preferences_embedding).reshape(1, -1), 
+            np.array(overview_embedding).reshape(1, -1)
+        )[0][0]
+        
+        # Additional semantic analysis using OpenAI
+        semantic_match_prompt = f"""
+        Analyze how well the following movie overview matches these user preferences:
+        
+        Movie Overview: {movie_overview}
+        User Preferences: {user_preferences}
+        
+        Rate the semantic match on a scale of 0-10, where:
+        0 = No match at all
+        5 = Moderate match
+        10 = Perfect match
+        
+        Provide just the numerical score.
+        """
+        
+        try:
+            semantic_response = openai.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": semantic_match_prompt}],
+                max_tokens=10
+            )
+            semantic_score = float(semantic_response.choices[0].message.content.strip())
+        except:
+            semantic_score = similarity * 10  # Fallback to cosine similarity score
+        
+        # Combine similarity and semantic analysis
+        return (similarity * 5) + (semantic_score * 0.5)
+        
+    except Exception as e:
+        logging.error(f"Error in overview relevance calculation: {str(e)}")
+        return 0
+
+
+def calculate_relevance_score(movie, analysis, movie_keywords, movie_overview=''):
+    """Enhanced relevance scoring function that includes overview analysis"""
+    try:
+        # Existing keyword and genre scoring logic
         score = 0
         
         # Base score from vote average and popularity
@@ -198,7 +262,7 @@ def calculate_relevance_score(movie, analysis, movie_keywords):
         score += (vote_average * 0.5)
         score += (min(popularity, 100) * 0.01)
         
-        # Keyword matching
+        # Keyword matching (existing logic)
         required_keywords = set(analysis.get('required_keywords', []))
         exclude_keywords = set(analysis.get('exclude_keywords', []))
         movie_keywords = set(movie_keywords)
@@ -231,6 +295,11 @@ def calculate_relevance_score(movie, analysis, movie_keywords):
             except (ValueError, TypeError, IndexError):
                 pass
         
+        # NEW: Overview semantic relevance
+        user_preferences = ' '.join(analysis.get('search_terms', []))
+        overview_score = calculate_overview_relevance(movie_overview, user_preferences, analysis)
+        score += overview_score
+        
         return max(score, 0)  # Ensure score doesn't go negative
         
     except Exception as e:
@@ -254,7 +323,7 @@ def get_movie_details(movie_id):
         return {}
 
 def process_preferences(preferences):
-    """Process user preferences and return relevant movies"""
+    """Updated process_preferences to include movie overview"""
     try:
         logging.info(f"Processing preferences: {preferences}")
         
@@ -279,7 +348,17 @@ def process_preferences(preferences):
         for movie in all_movies.values():
             try:
                 keywords = get_movie_keywords(movie['id'])
-                relevance_score = calculate_relevance_score(movie, analysis, keywords)
+                
+                # Fetch movie details to get overview
+                details = get_movie_details(movie['id'])
+                movie_overview = details.get('overview', '')
+                
+                relevance_score = calculate_relevance_score(
+                    movie, 
+                    analysis, 
+                    keywords, 
+                    movie_overview
+                )
                 movie['relevance_score'] = relevance_score
                 scored_movies.append(movie)
             except Exception as e:
